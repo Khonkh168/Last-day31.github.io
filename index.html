@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>សារលា - អនុសាខាស្រីស្នំ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import Khmer Battambang font for Khmer text and Inter for general text -->
+    <link href="https://fonts.googleapis.com/css2?family=Khmer+Battambang:wght@400;700&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* Base font for the body, using Inter as the primary sans-serif font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Apply Khmer Battambang font specifically to headings and elements with 'khmer-font' class */
+        h1, h2, .khmer-font {
+            font-family: 'Khmer Battambang', cursive;
+        }
+
+        /* Keyframes for the scrolling message text */
+        @keyframes scroll-text {
+            0% {
+                transform: translateY(100%); /* Start from below the container */
+            }
+            100% {
+                /* Scroll up and out of view, adjusted by a dynamic offset */
+                transform: translateY(calc(-100% - var(--scroll-height-offset, 0px)));
+            }
+        }
+
+        /* Keyframes for the floating heart icons and 'Khan Khon' text */
+        @keyframes float-up-element {
+            0% {
+                transform: translateY(0%); /* Start at original position */
+                opacity: 0; /* Start invisible */
+            }
+            20% {
+                opacity: 1; /* Fade in */
+            }
+            80% {
+                opacity: 1; /* Stay visible for most of the animation */
+            }
+            100% {
+                transform: translateY(-100vh); /* Float up out of the viewport */
+                opacity: 0; /* Fade out */
+            }
+        }
+
+        /* Styling for the floating heart icons */
+        .heart-icon {
+            position: absolute;
+            animation: float-up-element var(--animation-duration) linear var(--animation-delay) infinite;
+        }
+
+        /* Styling for the floating 'Khan Khon' text */
+        .last-day-text {
+            position: absolute;
+            animation: float-up-element var(--animation-duration) linear var(--animation-delay) infinite;
+        }
+
+        /* Hide scrollbar for the message container across different browsers */
+        .message-container::-webkit-scrollbar {
+            display: none; /* For Chrome, Safari, Opera */
+        }
+        .message-container {
+            -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+            scrollbar-width: none;  /* For Firefox */
+        }
+    </style>
+</head>
+<!-- Main body container with a gradient background, centered content, and padding -->
+<body class="min-h-screen bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center p-4">
+
+    <!-- Application root container where different pages will be rendered -->
+    <div id="app-root" class="min-h-screen flex items-center justify-center p-4 w-full">
+        <!-- Content will be rendered here dynamically by JavaScript -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const appRoot = document.getElementById('app-root');
+            let currentPage = 'page1'; // State variable to track the current page
+
+            // Detailed farewell message in Khmer, stored as a constant string
+            const detailedMessage = `
+                ខ្ញុំពិតជាមានមោទនភាពនិងរីករាយជាខ្លាំង
+                ដែលបានធ្វើការជាមួយអ្នកទាំងអស់គ្នានៅ
+                ស្រីស្នំជិតមួយឆ្នាំទាំងដែលយើងមកពីខេត្ត​
+                 និងស្រុកផ្សេងៗគ្នាខ្ញុំពិតជាអរគុណ អ្នកទាំ
+                ងអស់គ្នាចំពោះការគោរពស្រលាញ់អ្នកទាំ
+                ងអស់គ្នាមកកាន់ខ្ញុំហើយក៏អរគុណទៅកា
+                ន់អ្នកទាំងអស់គ្នាកន្លងមកដែលបានសហ
+                ការធ្វើការជាមួយគ្នាបានយ៉ាងរលូន។
+
+                ទោះបីជាខ្ញុំត្រូវចាកចេញក៏ដោយខ្ញុំសង្ឃឹម
+                ថាអ្នកទាំងអស់គ្នា​នឹងបន្តខិតខំ ប្រឹងប្រែង
+                ធ្វើការងារដើម្បីទទួលបានលទ្ធផលល្អនៅ
+                ក្នុងអនុសាខាស្រីស្នំ។​ញុមសង្ឃឹមថាសាខា
+                ស្រីស្នំនឹង​Growth ​អតិថិជន​និងGrowth
+                portfolio នៅក្នុងសាខា​ហើយLoan  
+                outstanding គ្នាយើងម្នាក់ៗកាន់ម្ភៃ
+                លានខ្ញុំសូមជូនពរគ្នាយើងឲ្យទទួលបាន
+                លទ្ធផលល្អគ្រប់ៗគ្នា។
+                
+                អ្នកទាំងអស់គ្នានៅតែអាចទំនាក់ទំនងសួរ
+                នាំញុមបានមិនថាតែរឿងការងារឬរឿង
+                ផ្សេងនោះទេញុមរីករាយនិងចែករំលែក
+                ទៅកាន់អ្នកទាំងអស់គ្នាសួរតាមហ្វេសប៊ុក​
+                ឬតេលេក្រាមមួយណាក៏បានញុមនៅតែ
+                ទំនាក់ទំនងនិងឆ្លើយជូនអ្នកទាំងអស់គ្នា។
+
+                ជាចុងក្រោយសូមជូនពរទៅកាន់អ្នក
+                ទាំងអស់គ្នាជួបតែសេចក្ដីសុខសេចក្តី
+                ចម្រើន​ និង ជោគជ័យគ្រប់ភារកិច្ច
+                ខ្ញុំសង្ឃឹមថាយើងនឹងមានឱកាសជួប
+                គ្នាម្ដងទៀតនៅថ្ងៃណាមួយ។
+
+                ពីខ្ញុំ
+                     ខន ឃន
+            `;
+
+            // Function to render the first page (introduction)
+            const renderPage1 = () => {
+                appRoot.innerHTML = `
+                    <div class="bg-white p-8 rounded-xl shadow-2xl max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl w-full text-center transform transition-all duration-300 hover:scale-105 border-t-4 border-b-4 border-purple-400">
+                        <h1 class="text-4xl font-extrabold text-red-700 mb-3 drop-shadow-md khmer-font">
+                            សួស្តីក្រុមការងារ
+                        </h1>
+                        <h2 class="text-2xl font-semibold text-blue-700 mb-6 khmer-font">
+                            អនុសាខាស្រីស្នំ
+                        </h2>
+                        <p class="text-gray-700 text-lg mb-10 leading-relaxed">
+                            សូមផ្ញើសារនេះទៅកាន់បុគ្គលិកទាំងអស់នៅអនុសាខាស្រីស្នំ
+                            មុននឹងខ្ញុំ Leave ពី Group ខ្ញុំក៏មានសារលាទៅកាន់
+                            អ្នកទាំងអស់គ្នាផងដែរ។
+                        </p>
+                        <button id="read-more-btn"
+                            class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-purple-300 text-lg">
+                            ចុចដើម្បីអានសារលម្អិត
+                        </button>
+                    </div>
+                `;
+                // Add event listener to the "Read More" button to switch to Page 2
+                document.getElementById('read-more-btn').onclick = () => {
+                    currentPage = 'page2';
+                    renderApp(); // Re-render the application to show Page 2
+                };
+            };
+
+            // Function to render the second page (detailed message with animations)
+            const renderPage2 = () => {
+                appRoot.innerHTML = `
+                    <div class="relative bg-white p-8 rounded-xl shadow-2xl max-w-screen-xl w-full text-center transform transition-all duration-300 hover:scale-105 overflow-hidden flex flex-col items-center border-t-4 border-b-4 border-pink-400">
+                        <h1 class="text-3xl font-extrabold text-purple-900 mb-2 drop-shadow-md z-20">
+                            My Last Day
+                        </h1>
+                        <h2 class="text-2xl font-semibold text-blue-800 mb-4 z-20 khmer-font">
+                            សារជូនទៅកាន់អ្នកទាំងអស់គ្នា
+                        </h2>
+
+                        <!-- Container for the scrolling message with hidden scrollbar -->
+                        <div class="relative overflow-hidden w-full px-4 message-container bg-gray-50 rounded-lg p-4" style="min-height: 300px; max-height: 600px;">
+                            <div id="message-content"
+                                class="absolute text-gray-800 text-lg leading-loose text-justify z-10 whitespace-pre-line"
+                                style="bottom: 0; width: calc(100% - 32px);">
+                                ${detailedMessage}
+                            </div>
+                        </div>
+
+                        <!-- Container for floating hearts and text, positioned absolutely -->
+                        <div id="floating-elements-container" class="absolute inset-0 z-0 pointer-events-none">
+                            </div>
+
+                        <button id="go-back-btn"
+                            class="mt-8 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-pink-300 z-20 text-lg">
+                            ចុចដើម្បីអានសារម្ដងទៀត
+                        </button>
+                    </div>
+                `;
+
+                // Add event listener to the "Go Back" button to switch to Page 1
+                document.getElementById('go-back-btn').onclick = () => {
+                    currentPage = 'page1';
+                    renderApp(); // Re-render the application to show Page 1
+                };
+
+                const messageContent = document.getElementById('message-content');
+                // Get the height of the message container to calculate scroll offset
+                let messageContainer = document.querySelector('.message-container');
+                let messageContainerHeight = messageContainer.offsetHeight;
+                let messageHeight = 0;
+
+                // Use setTimeout to ensure DOM has rendered before measuring scrollHeight
+                setTimeout(() => {
+                    messageHeight = messageContent.scrollHeight;
+                    // Calculate offset to ensure the last line scrolls completely out of view
+                    // The offset should be the height of the container plus some extra space
+                    const scrollHeightOffset = messageContainerHeight + 50; // Added 50px buffer
+
+                    messageContent.style.setProperty('--scroll-height-offset', `${scrollHeightOffset}px`);
+
+                    // Adjust animation duration based on content height for a consistent scroll speed
+                    // Ensure a minimum duration to prevent very fast scrolls for short messages
+                    const minDuration = 30; // seconds - Increased minimum duration for slower scroll
+                    const calculatedDuration = messageHeight / 10; // Increased divisor for slower speed
+                    const animationDuration = Math.max(minDuration, calculatedDuration);
+
+                    messageContent.style.animation = `scroll-text ${animationDuration}s linear infinite`;
+                }, 0);
+
+
+                const floatingElementsContainer = document.getElementById('floating-elements-container');
+
+                // Function to create a new heart icon with random properties
+                const createHeartIcon = () => {
+                    const initialLeft = Math.random() * 100; // Random horizontal position
+                    const initialBottom = Math.random() * 10; // Random starting vertical position
+                    const size = 18 + Math.random() * 18; // Random size for variety
+                    const animationDuration = 18 + Math.random() * 12; // Random animation duration
+                    const animationDelay = Math.random() * 18; // Random delay before animation starts
+                    // Random pink/purple color for the heart
+                    const heartColor = `rgba(${Math.floor(255 - Math.random() * 50)}, ${Math.floor(100 + Math.random() * 50)}, ${Math.floor(150 + Math.random() * 100)}, ${0.6 + Math.random() * 0.4})`;
+
+                    // SVG for a heart icon
+                    const heartSvg = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${heartColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
+                            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                        </svg>
+                    `;
+                    const heartDiv = document.createElement('div');
+                    heartDiv.className = 'heart-icon';
+                    heartDiv.innerHTML = heartSvg;
+                    heartDiv.style.left = `${initialLeft}%`;
+                    heartDiv.style.bottom = `${initialBottom}%`;
+                    heartDiv.style.setProperty('--animation-duration', `${animationDuration}s`);
+                    heartDiv.style.setProperty('--animation-delay', `${animationDelay}s`);
+                    return heartDiv;
+                };
+
+                // Function to create a new floating 'Khan Khon' text element
+                const createLastDayText = () => {
+                    const initialLeft = Math.random() * 100;
+                    const initialBottom = Math.random() * 10;
+                    const fontSize = 14 + Math.random() * 10; // Random font size
+                    const animationDuration = 18 + Math.random() * 12;
+                    const animationDelay = Math.random() * 18;
+
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'last-day-text font-bold text-blue-200 whitespace-nowrap opacity-75';
+                    textSpan.textContent = 'Khan Khon';
+                    textSpan.style.left = `${initialLeft}%`;
+                    textSpan.style.bottom = `${initialBottom}%`;
+                    textSpan.style.fontSize = `${fontSize}px`;
+                    textSpan.style.setProperty('--animation-duration', `${animationDuration}s`);
+                    textSpan.style.setProperty('--animation-delay', `${animationDelay}s`);
+                    return textSpan;
+                };
+
+                // Function to generate and append floating elements based on screen width
+                const generateFloatingElements = () => {
+                    floatingElementsContainer.innerHTML = ''; // Clear existing elements
+                    const width = window.innerWidth;
+                    let numHearts, numLastDayTexts;
+
+                    // Adjust number of floating elements based on screen size for better performance and aesthetics
+                    if (width < 640) { // Small screens (mobile)
+                        numHearts = 8;
+                        numLastDayTexts = 2;
+                    } else if (width < 1024) { // Medium screens (tablet)
+                        numHearts = 15;
+                        numLastDayTexts = 4;
+                    } else { // Large screens (desktop)
+                        numHearts = 25;
+                        numLastDayTexts = 6;
+                    }
+
+                    // Create and append heart icons
+                    for (let i = 0; i < numHearts; i++) {
+                        floatingElementsContainer.appendChild(createHeartIcon());
+                    }
+                    // Create and append 'Khan Khon' text elements
+                    for (let i = 0; i < numLastDayTexts; i++) {
+                        floatingElementsContainer.appendChild(createLastDayText());
+                    }
+                };
+
+                generateFloatingElements(); // Initial generation of floating elements
+                window.addEventListener('resize', generateFloatingElements); // Re-generate on window resize
+
+                // Cleanup function to remove the resize event listener when navigating away from Page 2
+                const cleanupPage2 = () => {
+                    window.removeEventListener('resize', generateFloatingElements);
+                };
+                // Store the cleanup function reference in a dataset attribute for later retrieval
+                appRoot.dataset.cleanup = 'cleanupPage2';
+            };
+
+            // Main render function to switch between pages and handle cleanup
+            const renderApp = () => {
+                // Check if a cleanup function exists from the previous page and execute it
+                if (appRoot.dataset.cleanup === 'cleanupPage2' && typeof cleanupPage2 === 'function') {
+                    cleanupPage2(); // Call the cleanup function
+                    appRoot.dataset.cleanup = ''; // Clear the cleanup flag
+                }
+
+                // Render the appropriate page based on the current page state
+                if (currentPage === 'page1') {
+                    renderPage1();
+                } else {
+                    renderPage2();
+                }
+            };
+
+            renderApp(); // Initial render of the application when the DOM is ready
+        });
+    </script>
+</body>
+</html>
